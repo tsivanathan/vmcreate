@@ -1,0 +1,23 @@
+-
+ name: "This play installs the webmin"
+ hosts: 192.168.1.73
+ gather_facts: no
+ tasks:
+  - name: "This task copies the webmin rpm to the dns svr"
+    copy:
+     src: ./webmin-2.000-1.noarch.rpm
+     dest: /tmp/
+
+  - name: "This task installs the webmin using rpm"
+    yum:
+     name: /tmp/webmin-2.000-1.noarch.rpm
+     state: present
+     disable_gpg_check: yes
+
+  - name: "This task enables the webmin firewall rules"
+    firewalld:
+     port: 10000/tcp
+     state: enabled
+     permanent: yes
+     immediate: yes
+

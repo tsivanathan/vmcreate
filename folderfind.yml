@@ -1,0 +1,25 @@
+---
+- name: Find folder path of an existing virtual machine
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+    - ./vars/vcenter_vars.yml
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python3"
+  tasks:
+    - set_fact:
+        vm_name: "ulvutip01"
+
+    - name: "Find folder for VM - {{ vm_name }}"
+      vmware_guest_find:
+        hostname: "{{ vcenter_server }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        validate_certs: False
+        name: "{{ vm_name }}"
+      delegate_to: localhost
+      register: vm_facts
+
+    - name: "Print the stored variable"
+      debug:
+       var: vm_facts

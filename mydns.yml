@@ -1,0 +1,59 @@
+-
+ name: "This play configures a bind dns"
+ hosts: 192.168.1.73
+ gather_facts: no
+ tasks:
+  - name: "This task installs the required bind packs"
+    yum:
+     name:
+      - bind
+      - bind-utils
+     state: installed
+
+  - name: "This task copies the named.conf to the dns svr"
+    copy:
+     src: ./named.conf
+     dest: /etc/named.conf
+     owner: root
+     group: named
+
+  - name: "This task copies the forward and reverse lookup files to dns svr"
+    copy:
+     src: "{{item}}"
+     dest: /var/named/
+     owner: named
+     group: named
+    loop:
+      - forward.rbc
+      - reverse.rbc
+
+  - name: "This task enables the named service"
+    service:
+     name: named
+     state: started
+     enabled: yes
+
+  - name: "This opens the firewall ports"
+    firewalld:
+     service: dns
+     permanent: yes
+     state: enabled
+     immediate: yes
+
+  - name: "This task copies the webmin rpm to the dns svr"
+    copy:
+     src: ./webmin-2.000-1.noarch.rpm
+     dest: /tmp/
+
+  - name: "This task installs the webmin using rpm"
+    yum:
+     name: /tmp/webmin-2.000-1.noarch.rpm
+     state: present
+
+  - name: "This task enables the webmin firewall rules"
+    firewalld:
+     port: 10000/tcp
+     state: enabled
+     permanent: yes
+     immediate: yes
+

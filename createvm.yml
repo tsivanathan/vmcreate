@@ -1,0 +1,38 @@
+- name: Create a virtual machine on given ESXi hostname
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+   - name: "This task creates the vm"
+     vmware_guest:
+      hostname: "192.168.1.155"
+      username: "administrator@rbc.local"
+      password: "Password1#"
+      validate_certs: no
+      datacenter: "Toronto"
+      folder: "/Toronto/vm/"
+      guest_id: "rhel8_64Guest"
+      name: test_vm_0001
+      state: poweredon
+      validate_certs: false
+      disk:
+       - size_gb: 10
+         type: thin
+         datastore: 120GB_1
+      hardware:
+         memory_mb: 512
+         num_cpus: 2
+         scsi: paravirtual
+      networks:
+       - name: "VM Network"
+         ip: 192.168.1.152
+         netmask: 255.255.255.0
+         device_type: vmxnet3
+         wait_for_ip_address: yes
+
+   - name: "This disables secure boot option"
+     vmware_guest_boot_manager:
+      name: test_vm_0001
+      boot_firmware: efi 
+      secure_boot_enabled: False
+
